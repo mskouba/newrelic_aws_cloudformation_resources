@@ -1,0 +1,11 @@
+
+.hypothesis/unicode_data/13.0.0/charmap.json.gz
+custom_newrelic_alerts_policies/.DS_Store
+custom_newrelic_alerts_policies/inputs/inputs_1_create.json
+custom_newrelic_alerts_policies/inputs/inputs_1_invalid.json
+custom_newrelic_alerts_policies/tests/read-test.json
+custom_newrelic_alerts_policies/src/.DS_Store
+custom_newrelic_alerts_policies/tests/create-test.json
+custom_newrelic_alerts_policies/inputs/inputs_1_update.json
+custom_newrelic_alerts_policies/tests/update-test.json
+.DS_Store
