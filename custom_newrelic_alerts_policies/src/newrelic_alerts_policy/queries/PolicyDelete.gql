@@ -1,0 +1,11 @@
+mutation PolicyDelete(
+  $accountId: Int!,
+  $id: ID!
+){
+  alertsPolicyDelete(
+    accountId: $accountId, 
+    id: $id
+  ) {
+    id
+  }
+}

@@ -1,0 +1,18 @@
+mutation alertsPolicyUpdate(
+  $accountId: Int!,
+  $id:ID!,
+  $alertsPolicyUpdateInput: AlertsPolicyUpdateInput!
+)
+{
+  alertsPolicyUpdate(
+    accountId: $accountId, 
+    id: $id, 
+    policy: $alertsPolicyUpdateInput
+  ) 
+  {
+    id
+    name
+    incidentPreference
+    accountId
+  }
+}

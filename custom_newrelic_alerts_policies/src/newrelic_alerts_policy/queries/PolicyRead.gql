@@ -1,0 +1,17 @@
+query PolicyRead(
+  $accountId: Int!, 
+  $id: ID!
+) {
+  actor {
+    account(id: $accountId) {
+      alerts {
+        policy(id: $id) {
+          accountId
+          id
+          incidentPreference
+          name
+        }
+      }
+    }
+  }
+}

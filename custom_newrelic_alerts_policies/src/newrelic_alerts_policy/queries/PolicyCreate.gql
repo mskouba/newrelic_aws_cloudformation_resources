@@ -1,0 +1,15 @@
+mutation alertsPolicyCreate(
+  $accountId: Int!, 
+  $alertsPolicyInput: AlertsPolicyInput!
+) {
+  alertsPolicyCreate(
+    accountId: $accountId, 
+    policy: $alertsPolicyInput
+  ) 
+  {
+    name
+    incidentPreference
+    id
+    accountId
+  }
+}

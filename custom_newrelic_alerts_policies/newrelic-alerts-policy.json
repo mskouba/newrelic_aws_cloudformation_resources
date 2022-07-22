@@ -1,0 +1,80 @@
+{
+    "typeName": "NewRelic::Alerts::Policy",
+    "description": "Cloudformation resource that manages New Relic policy.",
+    "definitions": {
+        "Policy": {
+            "description": "New Relic Policy object",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Name": {
+                    "description": "Description of the policy.",
+                    "type": "string"
+                },
+                "IncidentPreference": {
+                    "description": "Determines how incidents are created for critical violations of the conditions contained in the policy.",
+                    "type": "string",
+                    "enum": [
+                        "PER_POLICY",
+                        "PER_CONDITION",
+                        "PER_CONDITION_AND_TARGET"
+                      ]
+                },
+                "Id": {
+                    "description": "ID of the policy",
+                    "type": "integer"
+                }
+            }
+        }
+    },
+    "properties": {
+        "AccountId": {
+            "description": "New Relic account ID",
+            "type": "integer"
+            },
+        "ApiKey": {
+            "description": "New Relic API Key with permissions for NerdGraph",
+            "type": "string"
+        },
+        "Policy": {
+            "description": "New Relic Policy Object",
+            "$ref": "#/definitions/Policy",
+            "type": "object",
+            "additionalProperties": false
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AccountId",
+        "ApiKey",
+        "Policy"
+    ],
+    "readOnlyProperties": [
+        "/properties/Policy/Id"
+    ],
+    "primaryIdentifier": [
+        "/properties/Policy/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "NewRelicAlerts:CreatePolicy"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "NewRelicAlerts:ReadPolicy"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "NewRelicAlerts:UpdatePolicy"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "NewRelicAlerts:DeletePolicy"
+            ]
+        }
+    }
+}
