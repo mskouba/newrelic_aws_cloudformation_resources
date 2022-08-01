@@ -1,0 +1,82 @@
+query AlertsConditionRead(
+  $accountId: Int!,
+  $id: ID!,
+){
+  actor {
+    account(id: $accountId) {
+      alerts {
+        nrqlCondition(id: $id) {
+          ... on AlertsNrqlBaselineCondition {
+            id
+            name
+            nrql {
+              query
+            }
+            baselineDirection
+            description
+            enabled
+            expiration {
+              closeViolationsOnExpiration
+              expirationDuration
+              openViolationOnExpiration
+            }
+            policyId
+            runbookUrl
+            signal {
+              aggregationDelay
+              aggregationMethod
+              aggregationTimer
+              aggregationWindow
+              fillOption
+              fillValue
+              slideBy
+            }
+            terms {
+              thresholdOccurrences
+              thresholdDuration
+              threshold
+              priority
+              operator
+            }
+            type
+            violationTimeLimitSeconds
+          }
+          ... on AlertsNrqlStaticCondition {
+            id
+            name
+            nrql {
+              query
+            }
+            description
+            enabled
+            expiration {
+              closeViolationsOnExpiration
+              expirationDuration
+              openViolationOnExpiration
+            }
+            policyId
+            runbookUrl
+            signal {
+              aggregationDelay
+              aggregationMethod
+              aggregationTimer
+              aggregationWindow
+              fillOption
+              fillValue
+              slideBy
+            }
+            terms {
+              operator
+              priority
+              threshold
+              thresholdDuration
+              thresholdOccurrences
+            }
+            type
+            violationTimeLimitSeconds
+          }
+        }
+      }
+    }
+  }
+}

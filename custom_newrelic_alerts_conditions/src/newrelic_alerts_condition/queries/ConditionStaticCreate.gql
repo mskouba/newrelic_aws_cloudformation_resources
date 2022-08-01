@@ -1,0 +1,63 @@
+mutation AlertsConditionCreate(
+  $accountId: Int!, 
+  $policyId: ID!, 
+  $name: String!,
+  $enabled: Boolean!,
+  $expirationInput:AlertsNrqlConditionExpirationInput,
+  $nrqlInput:AlertsNrqlConditionQueryInput!,
+  $signalInput:AlertsNrqlConditionSignalInput,
+  $termsInput: [AlertsNrqlConditionTermsInput!]!,
+  $description: String,
+  $runbookUrl: String,
+  $violationTimeLimitSeconds: Seconds
+  
+) {
+  alertsNrqlConditionStaticCreate(
+    accountId: $accountId, 
+    condition: {
+    name: $name,
+    enabled: $enabled,
+    nrql: $nrqlInput,
+    terms: $termsInput,
+    signal: $signalInput,
+    expiration: $expirationInput,
+    violationTimeLimitSeconds: $violationTimeLimitSeconds,
+    description:$description,
+    runbookUrl: $runbookUrl
+    }
+    policyId: $policyId
+  ) {
+    id
+    description
+    enabled
+    expiration {
+      closeViolationsOnExpiration
+      expirationDuration
+      openViolationOnExpiration
+    }
+    name
+    nrql {
+      query
+    }
+    policyId
+    runbookUrl
+    signal {
+      aggregationDelay
+      aggregationMethod
+      aggregationTimer
+      aggregationWindow
+      fillOption
+      fillValue
+      slideBy
+    }
+    terms {
+      thresholdOccurrences
+      thresholdDuration
+      threshold
+      priority
+      operator
+    }
+    type
+    violationTimeLimitSeconds
+  }
+}

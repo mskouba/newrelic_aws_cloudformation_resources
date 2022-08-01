@@ -1,0 +1,36 @@
+{
+    "AccountId": ,
+    "ApiKey":,"",
+    "Condition": {
+        "Name": ,
+        "PolicyId": ,
+        "Type": ,
+        "Enabled": ,
+        "Nrql":{"Query": },
+        "Expiration": {
+            "CloseViolationsOnExpiration": ,
+            "ExpirationDuration": 
+        },
+        "Signal": {
+            "AggregationMethod": "",
+            "AggregationDelay": ,
+            "AggregationWindow": 
+        },
+        "Terms": [ 
+            {
+            "Operator": ,
+            "Priority": ,
+            "Threshold": ,
+            "ThresholdDuration": ,
+            "ThresholdOccurrences": 
+            },
+            {
+            "Operator": ,
+            "Priority": ,
+            "Threshold": ,
+            "ThresholdDuration": ,
+            "ThresholdOccurrences": 
+        }],
+        "ViolationTimeLimitSeconds": 
+        }
+}

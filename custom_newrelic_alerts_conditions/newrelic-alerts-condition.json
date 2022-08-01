@@ -1,0 +1,259 @@
+{
+    "typeName": "NewRelic::Alerts::Condition",
+    "description": "Resource that manages New Relic Alert Condition object.",
+    "definitions": {
+        "Nrql": {
+            "description": "The NRQL query that defines the signal for the condition.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Query": {
+                    "description": "NRQL syntax that defines the query.",
+                    "type": "string"
+                }
+            }
+        },
+        "Term": {
+            "description": "critical and warning term for the condition.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "Operator": {
+                    "description": "Operator used to compare against the threshold.",
+                    "type": "string",
+                    "enum": [
+                        "ABOVE",
+                        "ABOVE_OR_EQUALS",
+                        "BELOW",
+                        "BELOW_OR_EQUALS",
+                        "EQUALS",
+                        "NOT_EQUALS"
+                    ]
+                },
+                "Priority": {
+                    "description": "Priority determines whether notifications will be sent for violations or not.",
+                    "type": "string",
+                    "enum": [
+                        "CRITICAL",
+                        "WARNING"
+                    ]
+                },
+                "Threshold": {
+                    "description": "Value that triggers a violation.",
+                    "type": "number"
+                },
+                "ThresholdDuration": {
+                    "description": "The duration, in seconds, that the threshold must violate for in order to create a violation. This value must be within 60-7200 seconds and must be a multiple of the aggregation window.", 
+                    "type": "integer"
+                },
+                "ThresholdOccurrences": {
+                    "description": "How many data points must be in violation for the specified thresholdDuration.",
+                    "type": "string",
+                    "enum": [
+                        "ALL",
+                        "AT_LEAST_ONCE"
+                    ]
+                }
+            }
+        },
+        "Signal": {
+            "description": "Configuration that defines the signal that the NRQL condition will use to evaluate.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "AggregationDelay": {
+                    "description": "How long we wait for data that belongs in each aggregation window. Depending on your data, a longer delay may increase accuracy but delay notifications. Use aggregationDelay with the EVENT_FLOW and CADENCE methods. The maximum delay is 1200 seconds (20 minutes) when using EVENT_FLOW and 3600 seconds (60 minutes) when using CADENCE. In both cases, the minimum delay is 0 seconds and the default is 120 seconds. When using aggregationDelay, do not use evaluationOffset.",
+                    "type": "integer"
+                },
+                "AggregationMethod": {
+                    "description": "The method that determines when we consider an aggregation window to be complete so that we can evaluate the signal for violations. Default is EVENT_FLOW. When using any aggregationMethod, do not use evaluationOffset. When using the aggregationMethod with EVENT_TIMER, use aggregationTimer. For EVENT_FLOW and CADENCE, use aggregationDelay.",
+                    "type": "string",
+                    "enum": [
+                        "EVENT_FLOW",
+                        "EVENT_TIMER",
+                        "CADENCE"
+                    ],
+                    "default": "EVENT_FLOW"
+                },
+                "AggregationTimer": {
+                    "description": "How long we wait after each data point arrives to make sure we've processed the whole batch. Use aggregationTimer with the EVENT_TIMER method. The timer value can range from 5 seconds to 1200 seconds (20 minutes); the default is 60 seconds. When using aggregationTimer, do not use evaluationOffset.",
+                    "type": "integer"
+                },
+                "AggregationWindow": {
+                    "description": "Aggregation window controls the duration of the time window used to evaluate the NRQL query, in seconds. The value must be at least 30 seconds, and no more than 15 minutes (900 seconds). Default is 60 seconds.",
+                    "type": "integer"
+                },
+                "FillOption": {
+                    "description": "Option that determines the type of value that should be used to fill gaps (empty windows). Defaults to STATIC. Outlier NRQL conditions may only use NONE.",
+                    "type": "string",
+                    "enum": [
+                        "LAST_VALUE",
+                        "NONE",
+                        "STATIC"
+                    ],
+                    "default": "NONE"
+                },
+                "FillValue": {
+                    "description": "If using the static fill option, this the value used for filling. Defaults to 0.",
+                    "type": "integer"
+                },
+                "SlideBy": {
+                    "description": "This setting gathers data in overlapping time windows to smooth the chart line, making it easier to spot trends. The slideBy value is specified in seconds and must be smaller than and a factor of the aggregationWindow.",
+                    "type": "integer"
+                }
+            }
+        },
+        "Expiration": {
+            "description": "Settings for how violations are opened or closed when a signal expires.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "CloseViolationsOnExpiration": {
+                    "description": "Whether to close all open violations when the signal expires. Defaults to true.",
+                    "type": "boolean"
+                },
+                "ExpirationDuration": {
+                    "description": "The amount of time (in seconds) to wait before considering if the signal has been lost. Max value of 172800 (48 hours).",
+                    "type": "integer"
+                },
+                "OpenViolationsOnExpiration": {
+                    "description": "Whether to create a new lost signal violation to capture that the signal expired. Defaults to false.",
+                    "type": "boolean"
+                }
+            }
+        }
+    },
+    "properties": {
+       "AccountId": {
+        "description": "New Relic Account ID.",
+        "type": "integer"
+       },
+       "ApiKey":{
+        "description": "New Relic API Key with permissions for NerdGraph",
+        "type": "string"
+       },
+       "Condition": {
+        "description": "New Relic Condition object",
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+            "Id": {
+                "description": "ID of the condition",
+                "type": "integer"
+            },
+            "PolicyId":{
+                "description": "Policy ID for the condition.",
+                "type": "integer"
+               },
+            "Enabled": {
+                "description": "Whether the NRQL condition is enabled.",
+                "type": "boolean"
+               },
+            "Name": {
+                "description": "Name of the NRQL condition.",
+                "type": "string"
+            },
+            "Type": {
+                "description": "Type of condition.",
+                "type": "string",
+                "enum": [
+                    "STATIC",
+                    "BASELINE"
+                ]
+            },
+            "BaselineDirection": {
+                "description": "Direction in which the baseline is set on condition.",
+                "type": "string",
+                "enum": [
+                    "LOWER_ONLY",
+                    "UPPER_ONLY",
+                    "UPPER_AND_LOWER"
+                ]
+            },
+            "Nrql": {
+                "description": "The NRQL query that defines the signal for the condition.",
+                "type": "object",
+                "$ref": "#/definitions/Nrql",
+                "additionalProperties": false
+            },
+            "RunbookUrl": {
+                "description": "Runbook URL.",
+                "type": "string"
+            },
+            "Description": {
+                "description": "The custom violation description.",
+                "type": "string"
+            },
+            "Terms": {
+                "description": "List of critical and warning terms for the condition.",
+                "type": "array",
+                "insertionOrder": false,
+                "items": {
+                    "$ref": "#/definitions/Term"
+                }
+            },
+            "Signal": {
+                "description": "Configuration that defines the signal that the NRQL condition will use to evaluate.",
+                "type": "object",
+                "$ref": "#/definitions/Signal",
+                "additionalProperties": false
+            },
+            "Expiration": {
+                "description": "Settings for how violations are opened or closed when a signal expires.",
+                "type": "object",
+                "$ref": "#/definitions/Expiration",
+                "additionalProperties": false
+            },
+            "ViolationTimeLimitSeconds": {
+                "description": "Duration after which a violation automatically closes in seconds. Accepts values between 300 seconds (5 minutes) and 2592000 seconds (30 days). Default is 3 days (259200 seconds).",
+                "type": "integer",
+                "default": 259200
+            }
+        }
+        }
+    },
+
+    "additionalProperties": false,
+    "required": [
+        "AccountId",
+        "ApiKey",
+        "Condition"
+    ],
+    "readOnlyProperties": [
+        "/properties/Condition/Id"
+    ],
+    "createOnlyProperties": [
+        "/properties/Condition/PolicyId",
+        "/properties/Condition/Type"
+    ],
+    "primaryIdentifier": [
+        "/properties/Condition/Id",
+        "/properties/Condition/PolicyId",
+        "/properties/Condition/Type"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "NewRelicAlerts:CreateCondition"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "NewRelicAlerts:ReadCondition"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "NewRelicAlerts:UpdateCondition"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "NewRelicAlerts:DeleteCondition"
+            ]
+        }
+    }
+}
+
+
+

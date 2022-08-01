@@ -1,0 +1,11 @@
+mutation AlertsConditionDelete(
+  $accountId: Int!,
+  $id: ID!
+){
+  alertsConditionDelete(
+    accountId: $accountId, 
+    id: $id
+  ) {
+    id
+  }
+}
