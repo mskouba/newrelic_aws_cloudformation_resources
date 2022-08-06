@@ -41,18 +41,32 @@ def create_handler(
         resourceModel=model,
     )
 
+    LOG.info("Beginning create handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
 
     try:
 
-        LOG.info("Beginning create handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
-        
+        # Call New Relic API and return payload as result
         params = {"accountId": model.AccountId, "alertsPolicyInput": {"name": model.Policy.Name, "incidentPreference": model.Policy.IncidentPreference}}
         result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyCreate.gql", params=params)
 
-        model.Policy.Id = result['alertsPolicyCreate']['id']
+        # Write the ID returned to the model
+        model.Policy.Id = int(result['alertsPolicyCreate']['id'])
 
-        return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
-    
+        # Call the New Relic API to add any notfication channels to the policy
+        notificationChannelParams = {"accountId": model.AccountId, "id": model.Policy.Id, "notificationChannelIds": model.Policy.NotificationChannels}
+        notificationChannelResult = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/NotificationChannelsAddToPolicy.gql", params=notificationChannelParams)
+
+        # Check for any errors in the payload, this is not handled by the newrelic api client function due to notification channels using a different error handling schema.
+        if notificationChannelResult["alertsNotificationChannelsAddToPolicy"]["errors"] == []:
+
+            successfulNotificationChannels = [int(x["id"]) for x in notificationChannelResult["alertsNotificationChannelsAddToPolicy"]["notificationChannels"]]
+            model.Policy.NotificationChannels = successfulNotificationChannels
+            LOG.info ("Notification channels added successfully")
+            LOG.info("Completed create handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
+
+            return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
+        else:
+            raise exceptions.InternalFailure("An error occurred when adding notification channel. {}".format(str(notificationChannelResult["alertsNotificationChannelsAddToPolicy"]["errors"])))
     except:
         raise        
 
@@ -70,24 +84,41 @@ def update_handler(
         resourceModel=model,
     )
 
-
     LOG.info("Beginning update handler for {}: {}".format(TYPE_NAME, model.Policy.Name)) 
 
     try:
 
+        # Return not found error if policy ID is none
         if model.Policy.Id == None:
             raise exceptions.NotFound("Policy ID", model.Policy.Id)
         else:
 
-            progress.resourceModel = model
-            progress.status = OperationStatus.SUCCESS
-
+            # Call New Relic API and return payload as result
             params = {"accountId": model.AccountId, "id": model.Policy.Id, "alertsPolicyUpdateInput": {"name": model.Policy.Name, "incidentPreference": model.Policy.IncidentPreference}}
             result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyUpdate.gql", params=params)
 
+            # Write payload data to model
             model.Policy.Name = result['alertsPolicyUpdate']['name']
             model.Policy.IncidentPreference = result['alertsPolicyUpdate']['incidentPreference']
-            model.Policy.Id = result['alertsPolicyUpdate']['id']
+            model.Policy.Id = int(result['alertsPolicyUpdate']['id'])
+
+            # Compare notification channels in payload to model and determine whether any need to be added or removed
+            notificationChannelsToAdd = [set(model.Policy.NotificationChannels) - set(request.previousResourceState.Policy.NotificationChannels)]
+            notificationChannelsToDelete = [set(request.previousResourceState.Policy.NotificationChannels) - set(model.Policy.NotificationChannels)]
+            
+            # Add any notification channels that are not added yet
+            if notificationChannelsToAdd != [set()]:
+                notificationChannelAddParams = {"accountId": model.AccountId, "id": model.Policy.Id, "notificationChannelIds": notificationChannelsToAdd}
+                result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/NotificationChannelsAddToPolicy.gql", params=notificationChannelAddParams)
+
+            # Remove any notification channels that are not removed yet
+            if notificationChannelsToDelete != [set()]:
+                notificationChannelDeleteParams = {"accountId": model.AccountId, "id": model.Policy.Id, "notificationChannelIds": notificationChannelsToDelete}
+                result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/NotificationChannelsDeleteFromPolicy.gql", params=notificationChannelDeleteParams)
+
+            ProgressEvent(status=OperationStatus.IN_PROGRESS, resourceModel=model, callbackContext=callback_context)
+
+            LOG.info("Update complete, initiating read handler to confirm changes took place.")
             
             return read_handler(session, request, callback_context)
 
@@ -108,12 +139,15 @@ def delete_handler(
         resourceModel=None,
     )
     
-    LOG.info("Beginning create handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
+    LOG.info("Beginning delete handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
 
     try:
-
+        
+        # Call New Relic API and return payload as result
         params = {"accountId": model.AccountId, "id": model.Policy.Id}
         result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyDelete.gql", params=params)
+
+        LOG.info("Completed delete handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
 
         return ProgressEvent(status=OperationStatus.SUCCESS)
 
@@ -133,16 +167,59 @@ def read_handler(
     LOG.info("Beginning read handler for {}: {}".format(TYPE_NAME, model.Policy.Name))
 
     try: 
-
+        
+        # Call New Relic API and return payload as result, then get the relevant data as policy variable for readability
         params = {"accountId": model.AccountId, "id": model.Policy.Id}
         result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyRead.gql", params=params)
-
         policy = result["actor"]["account"]["alerts"]["policy"]
 
+        # Write datat returned to model
         model.Policy.Name = policy["name"]
-        model.Policy.Id = policy["id"]
+        model.Policy.Id = int(policy["id"])
         model.Policy.IncidentPreference = policy["incidentPreference"]
 
+        # Process of reading notification channels is inefficient due to New Relic not having an API call that can recieve a policy and return the attached notification channels.
+        # To accomplish this, we must pull all notification channels in the account and check whether they are attached to the policy.
+        # Due to this, it can take much longer to accomplish this step than any other handler operation in this suite of resources.
+        if "NotificationChannels" not in callback_context:
+
+            # Initialize variables in context callback to reference in loop
+            getNotificationChannelsParams = {"accountId": model.AccountId}
+            callback_context["NotificationChannels"] = []
+            callback_context["NotificationChannelsNotComplete"] = True
+            callback_context["cursor"] = None
+
+            while callback_context["NotificationChannelsNotComplete"]:
+
+                LOG.info("Pulling notification channels to check for channels attached to policy {}".format(model.Policy.Name))
+                
+                # Checks for cursor to ensure pagination is handled properly and all channels are pulled
+                if callback_context["cursor"] is not None:
+                    getNotificationChannelsParams["cursor"] = callback_context["cursor"]
+
+                result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/GetNotificationChannels.gql", params=getNotificationChannelsParams)
+
+                # Checks for nextCursor field in payload, in order to determine whether loop should continue
+                if result["actor"]["account"]["alerts"]["notificationChannels"]["nextCursor"] == None:
+                    callback_context["NotificationChannelsNotComplete"] = False
+                
+                else:
+                    callback_context["cursor"] = result["actor"]["account"]["alerts"]["notificationChannels"]["nextCursor"]
+                    
+                # Add notification channels that are attached to policy to list of notification channels
+                callback_context["NotificationChannels"].extend([int(x["id"]) for x in result["actor"]["account"]["alerts"]["notificationChannels"]["channels"] if model.Policy.Id in [int(y["id"]) for y in x["associatedPolicies"]["policies"]]])
+                
+                ProgressEvent(status=OperationStatus.IN_PROGRESS, resourceModel=model, callbackContext=callback_context)
+
+            # Write all found notification channels to model
+            model.Policy.NotificationChannels = callback_context["NotificationChannels"]
+
+            LOG.info("Notification channels identified and returned to model.")
+        
+        else:
+
+            model.Policy.NotificationChannels = callback_context["NotificationChannels"]
+            
         return ProgressEvent(
             status=OperationStatus.SUCCESS,
             resourceModel=model,

@@ -1,0 +1,21 @@
+mutation NotificationChannelsRemoveFromPolicy(
+  $accountId: Int!, 
+  $id: ID!, 
+  $notificationChannelIds: [ID!]!
+) {
+  alertsNotificationChannelsRemoveFromPolicy(
+    accountId: $accountId, 
+    notificationChannelIds: $notificationChannelIds, 
+    policyId: $id
+  ) {
+    policyId
+    notificationChannels {
+      id
+    }
+    errors {
+      description
+      errorType
+      notificationChannelId
+    }
+  }
+}

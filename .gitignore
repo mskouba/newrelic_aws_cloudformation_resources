@@ -9,3 +9,7 @@ custom_newrelic_alerts_policies/tests/create-test.json
 custom_newrelic_alerts_policies/inputs/inputs_1_update.json
 custom_newrelic_alerts_policies/tests/update-test.json
 .DS_Store
+
+*/tests/*
+*/inputs/*
+*.zip

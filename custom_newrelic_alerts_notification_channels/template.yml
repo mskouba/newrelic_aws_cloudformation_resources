@@ -1,24 +1,24 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
-Description: AWS SAM template for the NewRelic::Alerts::Policy resource type
+Description: AWS SAM template for the NewRelic::Alerts::NotificationChannel resource type
 
 Globals:
   Function:
-    Timeout: 900  # docker start-up times can be long for SAM CLI
+    Timeout: 180  # docker start-up times can be long for SAM CLI
     MemorySize: 256
 
 Resources:
   TypeFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: newrelic_alerts_policy.handlers.resource
+      Handler: newrelic_alerts_notificationchannel.handlers.resource
       Runtime: python3.7
       CodeUri: build/
 
   TestEntrypoint:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: newrelic_alerts_policy.handlers.test_entrypoint
+      Handler: newrelic_alerts_notificationchannel.handlers.test_entrypoint
       Runtime: python3.7
       CodeUri: build/
 

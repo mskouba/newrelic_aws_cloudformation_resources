@@ -68,6 +68,7 @@ _ResourceModel = ResourceModel
 class Policy(BaseModel):
     Name: Optional[str]
     IncidentPreference: Optional[str]
+    NotificationChannels: Optional[Sequence[int]]
     Id: Optional[int]
 
     @classmethod
@@ -80,6 +81,7 @@ class Policy(BaseModel):
         return cls(
             Name=json_data.get("Name"),
             IncidentPreference=json_data.get("IncidentPreference"),
+            NotificationChannels=json_data.get("NotificationChannels"),
             Id=json_data.get("Id"),
         )
 

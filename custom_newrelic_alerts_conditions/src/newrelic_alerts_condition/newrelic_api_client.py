@@ -32,6 +32,7 @@ def NewRelicApiRequest(key: str, template: str, params: dict):
 
         return result
 
+    # Map common GQL Transport Query Errors from New Relic APIs to the proper exception in Cloudformation CLI.
     except TransportQueryError as err:
 
         if err.errors[0]['message'] == "Not Found":

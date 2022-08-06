@@ -30,9 +30,9 @@ def NewRelicApiRequest(key: str, template: str, params: dict):
 
     # Map common GQL Transport Query Errors from New Relic APIs to the proper exception in Cloudformation CLI.
     except TransportQueryError as err:
-
+ 
         if err.errors[0]['message'] == "Not Found":
-            raise exceptions.NotFound("Policy ID", params["id"])
+            raise exceptions.NotFound("Notification Channel ID", params["id"])
 
         elif err.errors[0]["extensions"]["errorClass"] == "BAD_USER_INPUT":
             raise exceptions.InvalidRequest("New Relic Returned Code BAD_USER_INPUT")
@@ -46,8 +46,3 @@ def NewRelicApiRequest(key: str, template: str, params: dict):
     except:
         raise 
         
-    
-    
-
-
-

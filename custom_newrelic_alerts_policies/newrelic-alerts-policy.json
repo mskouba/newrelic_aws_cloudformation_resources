@@ -20,6 +20,15 @@
                         "PER_CONDITION_AND_TARGET"
                       ]
                 },
+                "NotificationChannels": {
+                    "description": "Notification Channels attached to the policy",
+                    "type": "array",
+                    "insertionOrder": false,
+                    "items": {
+                        "type": "integer"
+                    }
+
+                },
                 "Id": {
                     "description": "ID of the policy",
                     "type": "integer"

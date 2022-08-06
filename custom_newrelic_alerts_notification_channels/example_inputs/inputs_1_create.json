@@ -1,0 +1,12 @@
+{
+    "AccountId": 123456,
+    "ApiKey": "...",
+    "NotificationChannel": {
+        "Name": "...",
+        "Type": "...",
+        "Config": {
+            "Emails": ["..."],
+            "IncludeJson": false
+        }
+    }
+}

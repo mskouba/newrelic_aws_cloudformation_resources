@@ -12,7 +12,6 @@ from cloudformation_cli_python_lib import (
     exceptions,
     identifier_utils,
 )
-#from pyrsistent import v
 
 from .models import ResourceHandlerRequest, ResourceModel, _Nrql, _Expiration, _Signal, _Term
 from cloudformation_cli_python_lib.utils import deserialize_list
@@ -43,10 +42,11 @@ def create_handler(
         resourceModel=model,
     )
 
-    try:
+    LOG.info("Beginning create handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
 
-        LOG.warning("Beginning create handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
+    try:
         
+        # Prepare request params for create call
         params = {
             "accountId": model.AccountId,
             "policyId": model.Condition.PolicyId,
@@ -59,31 +59,23 @@ def create_handler(
             "termsInput": [{field.name[0].lower() + field.name[1:]:getattr(x, field.name) for field in fields(x) if getattr(x, field.name) is not None} for x in model.Condition.Terms]
             }
         
+        # Static and baseline conditions use different API functions and thus need to be handled by separate queries
         if model.Condition.Type == "STATIC":
-  
             result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionStaticCreate.gql", params=params)
-            
             model.Condition.Id = int(result['alertsNrqlConditionStaticCreate']['id'])
-
-            LOG.warning("Successfully created condition {}".format(model.Condition.Id))
+            LOG.info("Successfully created condition {}".format(model.Condition.Id))
 
             return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
             
-
-        
         elif model.Condition.Type == "BASELINE":
-
+            # Add baseline specific param to parameters
             params["baselineDirection"] = model.Condition.BaselineDirection
-
             result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionBaselineCreate.gql", params=params)
-
             model.Condition.Id = result['alertsNrqlConditionBaselineCreate']['id']
-            
-            LOG.warning("Successfully created condition {}".format(model.Condition.Id))
+            LOG.info("Successfully created condition {}".format(model.Condition.Id))
             
             return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
             
-    
     except:
         raise        
 
@@ -100,16 +92,16 @@ def update_handler(
         resourceModel=model,
     )
 
+    LOG.info("Beginning update handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
+
     try:
 
-        LOG.warning("Beginning update handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
-
+        # Returns a not found error if the condition Id passed to update is none
         if model.Condition.Id == None:
-
             raise exceptions.NotFound("Condition ID", model.Condition.Id)
-
         else:
 
+            # Prepare request params for update call
             params = {
                 "accountId": model.AccountId,
                 "id": model.Condition.Id,
@@ -122,24 +114,20 @@ def update_handler(
                 "termsInput": [{field.name[0].lower() + field.name[1:]:getattr(x, field.name) for field in fields(x) if getattr(x, field.name) is not None} for x in model.Condition.Terms]
                 }
 
+            # Static and baseline conditions use different API functions and thus need to be handled by separate queries
             if model.Condition.Type == "STATIC":
-
                 result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionStaticUpdate.gql", params=params)
-                
                 model.Condition.Id = int(result['alertsNrqlConditionStaticUpdate']['id'])
-                
-                LOG.warning("Successfully updated condition {}".format(model.Condition.Id))
+                LOG.info("Successfully updated condition {}".format(model.Condition.Id))
+
                 return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
             
             elif model.Condition.Type == "BASELINE":
-
                 params["baselineDirection"] = model.Condition.BaselineDirection
-
                 result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionBaselineUpdate.gql", params=params)
-
                 model.Condition.Id = int(result['alertsNrqlConditionBaselineUpdate']['id'])
-                
-                LOG.warning("Successfully updated condition {}".format(model.Condition.Id))
+                LOG.info("Successfully updated condition {}".format(model.Condition.Id))
+
                 return ProgressEvent(status=OperationStatus.SUCCESS, resourceModel=model)
                 
     except: 
@@ -158,15 +146,16 @@ def delete_handler(
         resourceModel=None,
     )
     
-    LOG.warning("Beginning delete handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
+    LOG.info("Beginning delete handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
 
     try:
         
+        #Call New Relic API to delete condition
         params = {"accountId": model.AccountId, "id": model.Condition.Id}
-
         result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionDelete.gql", params=params)
 
-        LOG.warning("Successfully deleted condition {}".format(result["alertsConditionDelete"]["id"]))
+        LOG.info("Successfully deleted condition {}".format(result["alertsConditionDelete"]["id"]))
+
         return ProgressEvent(status=OperationStatus.SUCCESS)
 
     except:
@@ -185,11 +174,12 @@ def read_handler(
  
     try: 
 
+        # Call New Relic API and return payload as result, then get just the relevant info as condition for readability
         params = {"accountId": model.AccountId, "id": model.Condition.Id}
         result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_condition/queries/ConditionRead.gql", params=params)
-
         condition = result["actor"]["account"]["alerts"]["nrqlCondition"]
         
+        # Write payload data to model
         model.Condition.Name = condition["name"]
         model.Condition.Id = int(condition["id"])
         model.Condition.Enabled = condition["enabled"]
@@ -202,6 +192,8 @@ def read_handler(
         model.Condition.Expiration = _Expiration._deserialize({key[0].upper() + key[1:]: value for key, value in condition["expiration"].items() if value is not None})
         model.Condition.Signal = _Signal._deserialize({key[0].upper() + key[1:]: value for key, value in condition["signal"].items() if value is not None})
         model.Condition.Terms = deserialize_list([{key[0].upper() + key[1:]:value for key, value in x.items() if value is not None} for x in condition["terms"]], _Term)
+
+        LOG.info("Completed read handler for {}: {}".format(TYPE_NAME, model.Condition.Name))
 
         return ProgressEvent(
             status=OperationStatus.SUCCESS,

@@ -1,0 +1,94 @@
+query NotificationChannelRead(
+  $accountId: Int!, 
+  $id: ID!
+) {
+  actor {
+    account(id: $accountId) {
+      alerts {
+        notificationChannel(id: $id) {
+          id
+          name
+          type
+          ... on AlertsXMattersNotificationChannel {
+            id
+            name
+            config {
+              integrationUrl
+            }
+            type
+          }
+          ... on AlertsWebhookNotificationChannel {
+            id
+            name
+            type
+            config {
+              baseUrl
+              basicAuth {
+                password
+                username
+              }
+              customHttpHeaders {
+                name
+                value
+              }
+              customPayloadBody
+              customPayloadType
+            }
+          }
+          ... on AlertsVictorOpsNotificationChannel {
+            id
+            name
+            config {
+              key
+              routeKey
+            }
+            type
+          }
+          ... on AlertsSlackNotificationChannel {
+            id
+            name
+            config {
+              teamChannel
+              url
+            }
+            type
+          }
+          ... on AlertsPagerDutyNotificationChannel {
+            id
+            name
+            type
+            config {
+              apiKey
+            }
+          }
+          ... on AlertsOpsGenieNotificationChannel {
+            id
+            name
+            type
+            config {
+              apiKey
+              dataCenterRegion
+              recipients
+              tags
+              teams
+            }
+          }
+          ... on AlertsNotificationChannel {
+            id
+            name
+            type
+          }
+          ... on AlertsEmailNotificationChannel {
+            id
+            name
+            type
+            config {
+              emails
+              includeJson
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+mutation NotificationChannelDelete(
+  $accountId: Int!,
+  $id: ID!
+){
+  alertsNotificationChannelDelete(
+    accountId: $accountId, 
+    id: $id
+  )
+  {
+    error {
+      description
+      errorType
+      notificationChannelId
+    }
+    id
+  }
+}

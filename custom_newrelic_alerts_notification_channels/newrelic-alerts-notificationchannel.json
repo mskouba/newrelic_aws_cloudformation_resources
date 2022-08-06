@@ -1,0 +1,212 @@
+{
+    "typeName": "NewRelic::Alerts::NotificationChannel",
+    "description": "Cloudformation resource that manages New Relic notification channels.",
+    "definitions": {
+            "Config": {
+                "description": "Configuration items for notification channel such as API keys, integration URLs, etc.",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "Emails": {
+                        "description": "List of email recipients",
+                        "type": "array",
+                        "insertionOrder": false,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "IncludeJson": {
+                        "description": "Setting to determine whether payload JSON will be sent in email",
+                        "type": "boolean"
+                    },
+                    "ApiKey": {
+                        "description": "API Key for OpsGenie and PagerDuty notification channel types",
+                        "type": "string"
+                    },
+                    "DataCenterRegion": {
+                        "description": "OpsGenie Data Center",
+                        "type": "string",
+                        "enum": [
+                            "EU",
+                            "US"
+                        ]
+                    },
+                    "Recipients": {
+                        "description": "List of email recipients for OpsGenie Notification Channels",
+                        "type": "array",
+                        "insertionOrder": false,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "Tags": {
+                        "description": "Tags for OpsGenie Notification Channels",
+                        "type": "array",
+                        "insertionOrder": false,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "Teams": {
+                        "description": "Teams for OpsGenie Notification Channels",
+                        "type": "array",
+                        "insertionOrder": false,
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "TeamChannel": {
+                        "description": "Slack channel name",
+                        "type": "string"
+                    },
+                    "Url": {
+                        "description": "Slack channel URL",
+                        "type": "string"
+                    },
+                    "Key": {
+                        "description": "VictorOps Key",
+                        "type": "string"
+                    },
+                    "RouteKey": {
+                        "description": "VictorOps route key",
+                        "type": "string"
+                    },
+                    "BaseUrl": {
+                        "description": "Webhook base URL",
+                        "type": "string"
+                    },
+                    "BasicAuth": {
+                        "description": "webhook basic auth",
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                            "Username": {
+                                "description": "Username",
+                                "type": "string"
+                            },
+                            "Password": {
+                                "description": "Password",
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "CustomHttpHeaders": {
+                        "description": "Custom HTTP headers",
+                        "type": "array",
+                        "insertionOrder": false,
+                        "items":{
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "Name": {
+                                    "description": "Header name",
+                                    "type": "string"
+                                },
+                                "Value": {
+                                    "description": "Header value",
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "CustomPayloadBody": {
+                        "description": "Custom Payload body",
+                        "type": "string"
+                    },
+                    "CustomPayloadType": {
+                        "description": "Webhook custom payload type",
+                        "type": "string",
+                        "enum": [
+                            "FORM",
+                            "JSON"
+                        ]
+                    },
+                    "IntegrationUrl": {
+                        "description": "xMatters integration URL",
+                        "type": "string"
+                    }
+                }
+
+            }
+        },
+    "properties": {
+        "AccountId": {
+            "description": "New Relic account ID",
+            "type": "integer"
+            },
+        "ApiKey": {
+            "description": "New Relic API Key with permissions for NerdGraph",
+            "type": "string"
+        },
+        "NotificationChannel": {
+            "description": "New Relic Notification Channel Object",
+            "type": "object",
+            "additionalProperties": false,
+            "properties":{
+                "Name": {
+                    "description": "Name of the notification channel.",
+                    "type": "string"
+                },
+                "Type": {
+                    "description": "Specifies the type of notification channel.",
+                    "type": "string",
+                    "enum": [
+                        "EMAIL",
+                        "OPSGENIE",
+                        "PAGERDUTY",
+                        "SLACK",
+                        "VICTOROPS",
+                        "WEBHOOK",
+                        "XMATTERS"
+                      ]
+                },
+                "Id": {
+                    "description": "ID of the policy",
+                    "type": "integer"
+                },
+                "Config": {
+                    "description": "Configuration items for notification channel such as API keys, integration URLs, etc.",
+                    "type": "object",
+                    "additionalProperties": false,
+                    "$ref": "#/definitions/Config"                
+                }   
+            }
+        }
+    },
+    "additionalProperties": false,
+    "required": [
+        "AccountId",
+        "ApiKey"
+    ],
+    "readOnlyProperties": [
+        "/properties/NotificationChannel/Id"
+    ],
+    "createOnlyProperties": [
+        "/properties/NotificationChannel/Type"
+    ],
+    "primaryIdentifier": [
+        "/properties/NotificationChannel/Id"
+    ],
+    "handlers": {
+        "create": {
+            "permissions": [
+                "NewRelicAlerts:CreateNotificationChannel"
+            ]
+        },
+        "read": {
+            "permissions": [
+                "NewRelicAlerts:ReadNotificationChannel"
+            ]
+        },
+        "update": {
+            "permissions": [
+                "NewRelicAlerts:UpdateNotificationChannel"
+            ]
+        },
+        "delete": {
+            "permissions": [
+                "NewRelicAlerts:DeleteNotificationChannel"
+            ]
+        }
+    }
+}

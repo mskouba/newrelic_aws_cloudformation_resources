@@ -1,0 +1,51 @@
+mutation NotificationChannelUpdate(
+  $accountId: Int!,
+  $id: ID!,
+  $notificationChannelInput: AlertsNotificationChannelUpdateConfiguration!
+){
+  alertsNotificationChannelUpdate(
+    accountId: $accountId, 
+    id: $id, 
+    notificationChannel: $notificationChannelInput
+  ) {
+    error {
+      description
+      errorType
+      notificationChannelId
+    }
+    notificationChannel {
+      ... on AlertsEmailNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsOpsGenieNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsPagerDutyNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsSlackNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsVictorOpsNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsXMattersNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsWebhookNotificationChannel {
+        id
+        name
+      }
+    }
+  }
+}

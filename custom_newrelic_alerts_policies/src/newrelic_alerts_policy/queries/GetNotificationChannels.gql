@@ -1,0 +1,23 @@
+query getNotificationChannels(
+  $accountId: Int!, 
+  $cursor: String
+) 
+{
+  actor {
+    account(id: $accountId) {
+      alerts {
+        notificationChannels(cursor: $cursor) {
+          channels {
+            id
+            associatedPolicies {
+              policies {
+                id
+              }
+            }
+          }
+          nextCursor
+        }
+      }
+    }
+  }
+}

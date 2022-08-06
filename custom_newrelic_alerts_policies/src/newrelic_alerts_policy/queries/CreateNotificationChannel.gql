@@ -1,0 +1,53 @@
+
+mutation CreateNotificationChannel(
+  $accountId: Int!,
+  $emails: [String!]!,
+  $includeJson: Boolean!,
+  $name: String!
+) {
+  alertsNotificationChannelCreate(accountId: $accountId, 
+    notificationChannel: {
+      email: {
+        emails: $emails, 
+        includeJson: $includeJson, 
+        name: $name}}) {
+    error {
+      errorType
+      description
+    }
+    notificationChannel {
+      ... on AlertsXMattersNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsWebhookNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsVictorOpsNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsSlackNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsPagerDutyNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsOpsGenieNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsNotificationChannel {
+        id
+        name
+      }
+      ... on AlertsEmailNotificationChannel {
+        id
+        name
+      }
+    }
+  }
+}

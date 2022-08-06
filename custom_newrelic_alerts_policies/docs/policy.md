@@ -12,6 +12,7 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 {
     "<a href="#name" title="Name">Name</a>" : <i>String</i>,
     "<a href="#incidentpreference" title="IncidentPreference">IncidentPreference</a>" : <i>String</i>,
+    "<a href="#notificationchannels" title="NotificationChannels">NotificationChannels</a>" : <i>[ Integer, ... ]</i>,
 }
 </pre>
 
@@ -20,6 +21,8 @@ To declare this entity in your AWS CloudFormation template, use the following sy
 <pre>
 <a href="#name" title="Name">Name</a>: <i>String</i>
 <a href="#incidentpreference" title="IncidentPreference">IncidentPreference</a>: <i>String</i>
+<a href="#notificationchannels" title="NotificationChannels">NotificationChannels</a>: <i>
+      - Integer</i>
 </pre>
 
 ## Properties
@@ -43,6 +46,16 @@ _Required_: No
 _Type_: String
 
 _Allowed Values_: <code>PER_POLICY</code> | <code>PER_CONDITION</code> | <code>PER_CONDITION_AND_TARGET</code>
+
+_Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
+
+#### NotificationChannels
+
+Notification Channels attached to the policy
+
+_Required_: No
+
+_Type_: List of Integer
 
 _Update requires_: [No interruption](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html#update-no-interrupt)
 

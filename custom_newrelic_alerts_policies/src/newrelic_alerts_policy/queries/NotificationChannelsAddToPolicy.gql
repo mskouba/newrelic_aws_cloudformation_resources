@@ -1,0 +1,21 @@
+mutation NotificationChannelsAddToPolicy(
+  $accountId: Int!, 
+  $id: ID!, 
+  $notificationChannelIds: [ID!]!
+) {
+  alertsNotificationChannelsAddToPolicy(
+    accountId: $accountId, 
+    notificationChannelIds: $notificationChannelIds, 
+    policyId: $id
+  ) {
+    policyId
+    notificationChannels {
+      id
+    }
+    errors {
+      description
+      errorType
+      notificationChannelId
+    }
+  }
+}

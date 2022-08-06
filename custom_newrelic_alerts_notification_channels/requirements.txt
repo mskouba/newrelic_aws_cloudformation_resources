@@ -1,0 +1,4 @@
+cloudformation-cli-python-lib>=2.1.9
+gql
+requests_toolbelt
+requests
