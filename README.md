@@ -1,6 +1,8 @@
-# New Relic AWS Cloudformation Resources
+# New Relic AWS CloudFormation Resources
 
 ### Custom AWS Cloudformation Resources for implementing alert infrastructure as code in New Relic
+
+This repository is home to various custom resources for use in AWS CloudFormation templates. These can be used to manage new Relic alerting configurations such as policies, NRQL conditions, and notification channels via cloudformation.
 
 ### Requirements
 
