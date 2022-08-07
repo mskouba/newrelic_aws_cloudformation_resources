@@ -8,6 +8,7 @@ This repository is home to various custom resources for use in AWS CloudFormatio
 
 - AWS CLI 
 - SAM CLI
+- Docker
 
 ### Installation
 
