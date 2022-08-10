@@ -103,16 +103,16 @@ def update_handler(
             model.Policy.Id = int(result['alertsPolicyUpdate']['id'])
 
             # Compare notification channels in payload to model and determine whether any need to be added or removed
-            notificationChannelsToAdd = [set(model.Policy.NotificationChannels) - set(request.previousResourceState.Policy.NotificationChannels)]
-            notificationChannelsToDelete = [set(request.previousResourceState.Policy.NotificationChannels) - set(model.Policy.NotificationChannels)]
+            notificationChannelsToAdd = list(set(model.Policy.NotificationChannels) - set(request.previousResourceState.Policy.NotificationChannels))
+            notificationChannelsToDelete = list(set(request.previousResourceState.Policy.NotificationChannels) - set(model.Policy.NotificationChannels))
             
             # Add any notification channels that are not added yet
-            if notificationChannelsToAdd != [set()]:
+            if notificationChannelsToAdd != []:
                 notificationChannelAddParams = {"accountId": model.AccountId, "id": model.Policy.Id, "notificationChannelIds": notificationChannelsToAdd}
                 result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/NotificationChannelsAddToPolicy.gql", params=notificationChannelAddParams)
 
             # Remove any notification channels that are not removed yet
-            if notificationChannelsToDelete != [set()]:
+            if notificationChannelsToDelete != []:
                 notificationChannelDeleteParams = {"accountId": model.AccountId, "id": model.Policy.Id, "notificationChannelIds": notificationChannelsToDelete}
                 result = NewRelicApiRequest(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/NotificationChannelsDeleteFromPolicy.gql", params=notificationChannelDeleteParams)
 
