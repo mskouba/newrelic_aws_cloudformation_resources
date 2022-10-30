@@ -8,7 +8,13 @@ from cloudformation_cli_python_lib import exceptions
 
 LOG = logging.getLogger(__name__)
 
-def NewRelicApiRequest(key: str, template: str, params: dict):
+def new_relic_api_request(key: str, template: str, params: dict) -> dict:
+
+    """
+    Function to handle GraphQL requests to New Relic NerdGraph API endpoints.
+    Handles common error received from New Relic.
+    Relies on gql library.
+    """
 
     try:
 
@@ -21,7 +27,7 @@ def NewRelicApiRequest(key: str, template: str, params: dict):
 
         client = Client(transport=transport, fetch_schema_from_transport=True, serialize_variables=True)
 
-        with open(template) as query:
+        with open(template, encoding="utf-8") as query:
             query = gql(query.read())
 
         result = client.execute(query, variable_values=params)
@@ -43,11 +49,5 @@ def NewRelicApiRequest(key: str, template: str, params: dict):
     except GraphQLError as err:
         raise exceptions.InvalidRequest("Invalid Value Specified. ", err)
 
-    except:
-        raise 
-        
-    
-    
-
-
-
+    #except Exception as err:
+      #  raise exceptions.Unknown("Unkown Error Occurred: ") from err
