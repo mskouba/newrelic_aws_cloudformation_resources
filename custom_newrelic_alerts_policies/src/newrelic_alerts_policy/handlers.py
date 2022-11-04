@@ -2,6 +2,7 @@ import logging
 import os
 from typing import Any, MutableMapping, Optional
 
+# pylint: disable=unused-argument,unused-import
 from cloudformation_cli_python_lib import (
     Action,
     HandlerErrorCode,
@@ -12,6 +13,7 @@ from cloudformation_cli_python_lib import (
     exceptions,
     identifier_utils,
 )
+# pylint: enable=unused-argument,unused-import
 
 from .models import ResourceHandlerRequest, ResourceModel
 
@@ -27,7 +29,7 @@ resource = Resource(TYPE_NAME, ResourceModel)
 test_entrypoint = resource.test_entrypoint
 
 
-
+# pylint: disable=unused-argument,unused-variable
 @resource.handler(Action.CREATE)
 def create_handler(
     session: Optional[SessionProxy],
@@ -46,7 +48,7 @@ def create_handler(
         status=OperationStatus.IN_PROGRESS,
         resourceModel=model,
     )
-
+# pylint: enable=unused-argument,unused-variable
 
     LOG.info("Beginning create handler for %s: %s", TYPE_NAME, model.Policy.Name)
 
@@ -55,7 +57,9 @@ def create_handler(
         # Call New Relic API and return payload as result
         params = {"accountId": model.AccountId, "alertsPolicyInput": {"name": model.Policy.Name, "incidentPreference": model.Policy.IncidentPreference}}
         LOG.info("Parameters being sent: %s", params)
-        result = new_relic_api_request(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyCreate.gql", params=params)
+        template = os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyCreate.gql"
+        LOG.info("Template being sent: %s", template)
+        result = new_relic_api_request(key=model.ApiKey, template=template, params=params)
 
         # Write the ID returned to the model
         model.Policy.Id = int(result["alertsPolicyCreate"]["id"])
@@ -80,7 +84,7 @@ def create_handler(
         raise exceptions.Unknown("Unkown Error Occurred: ") from err
 
 
-
+# pylint: disable=unused-argument,unused-variable
 @resource.handler(Action.UPDATE)
 def update_handler(
     session: Optional[SessionProxy],
@@ -97,7 +101,7 @@ def update_handler(
         status=OperationStatus.IN_PROGRESS,
         resourceModel=model,
     )
-
+# pylint: enable=unused-argument,unused-variable
 
     LOG.info("Beginning update handler for %s: %s", TYPE_NAME, model.Policy.Name)
     try:
@@ -109,7 +113,10 @@ def update_handler(
 
             # Call New Relic API and return payload as result
             params = {"accountId": model.AccountId, "id": model.Policy.Id, "alertsPolicyUpdateInput": {"name": model.Policy.Name, "incidentPreference": model.Policy.IncidentPreference}}
-            result = new_relic_api_request(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyUpdate.gql", params=params)
+            LOG.info("Parameters being sent: %s", params)
+            template = os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyUpdate.gql"
+            LOG.info("Template being sent: %s", template)
+            result = new_relic_api_request(key=model.ApiKey, template=template, params=params)
 
             # Write payload data to model
             model.Policy.Name = result["alertsPolicyUpdate"]["name"]
@@ -142,7 +149,7 @@ def update_handler(
      #   raise exceptions.Unknown("Unkown Error Occurred: ") from err
 
 
-
+# pylint: disable=unused-argument,unused-variable
 @resource.handler(Action.DELETE)
 def delete_handler(
     session: Optional[SessionProxy],
@@ -159,6 +166,7 @@ def delete_handler(
         status=OperationStatus.IN_PROGRESS,
         resourceModel=None,
     )
+# pylint: enable=unused-argument,unused-variable
 
     LOG.info("Beginning delete handler for %s: %s", TYPE_NAME, model.Policy.Name)
 
@@ -166,7 +174,10 @@ def delete_handler(
 
         # Call New Relic API and return payload as result
         params = {"accountId": model.AccountId, "id": model.Policy.Id}
-        result = new_relic_api_request(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyDelete.gql", params=params)
+        LOG.info("Parameters being sent: %s", params)
+        template = os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyDelete.gql"
+        LOG.info("Template being sent: %s", template)
+        result = new_relic_api_request(key=model.ApiKey, template=template, params=params)
 
         LOG.info("Completed delete handler for %s: %s", TYPE_NAME, model.Policy.Name)
 
@@ -178,14 +189,14 @@ def delete_handler(
      #   raise exceptions.Unknown("Unkown Error Occurred: ") from err
 
 
-
+# pylint: disable=unused-argument,unused-variable
 @resource.handler(Action.READ)
 def read_handler(
     session: Optional[SessionProxy],
     request: ResourceHandlerRequest,
     callback_context: MutableMapping[str, Any],
 ) -> ProgressEvent:
-
+# pylint: enable=unused-argument,unused-variable
     """
     Read handler for reading policies
     """
@@ -198,7 +209,10 @@ def read_handler(
 
         # Call New Relic API and return payload as result, then get the relevant data as policy variable for readability
         params = {"accountId": model.AccountId, "id": model.Policy.Id}
-        result = new_relic_api_request(key=model.ApiKey, template=os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyRead.gql", params=params)
+        LOG.info("Parameters being sent: %s", params)
+        template = os.path.abspath(os.getcwd()) + "/newrelic_alerts_policy/queries/PolicyRead.gql"
+        LOG.info("Template being sent: %s", template)
+        result = new_relic_api_request(key=model.ApiKey, template=template, params=params)
         policy = result["actor"]["account"]["alerts"]["policy"]
 
         # Write datat returned to model
