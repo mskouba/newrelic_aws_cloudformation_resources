@@ -1,5 +1,7 @@
 # New Relic AWS CloudFormation Resources
 
+![CodeBuild Testing Suite](https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiSkYxMnFVWWVGcE1QNEtqQzZyMzh1b2tYbUltbUJUcVBib2d3MEZDaGRYckZTMUxNR0NKbUtsS2ZSMGRIZFNBZnQ5ZnBBaFVMN1k1cC9ha0VRVEJ4ckJFPSIsIml2UGFyYW1ldGVyU3BlYyI6InhOWHZoWVBUVWY1M0F5R1YiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
+
 ### Custom AWS Cloudformation Resources for implementing alert infrastructure as code in New Relic
 
 This repository is home to various custom resources for use in AWS CloudFormation templates. These can be used to manage new Relic alerting configurations such as policies, NRQL conditions, and notification channels via cloudformation.
