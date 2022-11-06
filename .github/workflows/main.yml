@@ -14,14 +14,13 @@ jobs:
         python-version: '3.10'
     - name: setup 
       run: | 
-        sudo su -
-        apt update
-        snap install docker -y
-        apt install awscli -y
+        sudo apt update
+        sudo snap install docker -y
+        sudo apt install awscli -y
         pip3 install aws-sam-cli
         pip3 install cloudformation-cli cloudformation-cli-python-plugin
         pip3 install werkzeug==0.15
-        systemctl start docker
+        sudo systemctl start docker
 
 
     
