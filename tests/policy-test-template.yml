@@ -1,0 +1,65 @@
+Parameters:
+    NewRelicAccountId:
+        Type: String
+    NewRelicApiKey:
+        Type: String
+Resources:
+    TestPolicy:
+        Type: "NewRelic::Alerts::Policy"
+        Properties:
+            AccountId: 
+                Ref: NewRelicAccountId
+            ApiKey: 
+                Ref: NewRelicApiKey
+            Policy:
+                Name: "Policy with a name"
+                IncidentPreference: "PER_CONDITION"
+                NotificationChannels: 
+                    - !Ref TestChannel
+    TestChannel:
+        Type: "NewRelic::Alerts::NotificationChannel"
+        Properties:
+            AccountId: 
+                Ref: NewRelicAccountId
+            ApiKey: 
+                Ref: NewRelicApiKey
+            NotificationChannel:
+                Name: "Channel with a name"
+                Type: "EMAIL"
+                Config:
+                    Emails:
+                        - "test@test.com"
+                    IncludeJson: false
+    TestCondition:
+        Type: "NewRelic::Alerts::Condition"
+        Properties:
+            AccountId: 
+                Ref: NewRelicAccountId
+            ApiKey: 
+                Ref: NewRelicApiKey
+            Condition:
+                Name: "Condition with a name"
+                PolicyId: !Ref TestPolicy
+                Type: "STATIC"
+                Enabled: true
+                Nrql:
+                    Query: "SELECT count(*) FROM Transaction"
+                Expiration:
+                    CloseViolationsOnExpiration: true
+                    ExpirationDuration: 600
+                Signal:
+                    AggregationMethod: "EVENT_FLOW"
+                    AggregationDelay: 120
+                    AggregationWindow: 120
+                Terms:
+                    - Operator: "ABOVE"
+                      Priority: "WARNING"
+                      Threshold: 2
+                      ThresholdDuration: 360
+                      ThresholdOccurrences: "ALL"
+                    - Operator: "ABOVE"
+                      Priority: "CRITICAL"
+                      Threshold: 5
+                      ThresholdDuration: 360
+                      ThresholdOccurrences: "ALL"
+                ViolationTimeLimitSeconds: 3600
