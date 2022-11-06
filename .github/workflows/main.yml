@@ -5,14 +5,14 @@ on:
     - main
 jobs:
   test_job:
-    name: deploy to staging
+    name: Test Suite
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
     - uses: actions/setup-python@v4
       with:
         python-version: '3.10'
-    - name: setup 
+    - name: Set Up Environment
       run: | 
         sudo apt-get update
         sudo snap install docker
@@ -21,6 +21,10 @@ jobs:
         pip3 install cloudformation-cli cloudformation-cli-python-plugin
         pip3 install werkzeug==0.15
         sudo systemctl start docker
+    - name: Build
+      run: source register_all.sh
+    - name: Test Scripts
+      run: source tests/policy-test.sh
 
 
     
