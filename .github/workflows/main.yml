@@ -1,0 +1,34 @@
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+jobs:
+  test_job:
+    name: deploy to staging
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+    - name: setup 
+      run: | 
+        sudo su -
+        apt update
+        snap install docker -y
+        apt install awscli -y
+        apt install python3 -y
+        pip3 install aws-sam-cli
+        pip3 install cloudformation-cli cloudformation-cli-python-plugin
+        pip3 install werkzeug==0.15
+        systemctl start docker
+
+
+    
+        
+      
+      
+      
+      
+      
