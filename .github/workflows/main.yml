@@ -18,7 +18,6 @@ jobs:
         apt update
         snap install docker -y
         apt install awscli -y
-        apt install python3 -y
         pip3 install aws-sam-cli
         pip3 install cloudformation-cli cloudformation-cli-python-plugin
         pip3 install werkzeug==0.15
