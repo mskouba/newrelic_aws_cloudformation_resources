@@ -2,7 +2,9 @@
 
 echo "Beginning Policy Test"
 
-template=$( cat policy-test-template.yml )
+cd "$(dirname "$0")"
+
+template=$( cat $PWD/policy-test-template.yml )
 stack_arn=$( aws cloudformation create-stack --stack-name "policy-test-template" \
 --template-body $template \
 --parameters ParameterKey=NewRelicAccountId,ParameterValue=$NewRelicAccountId ParameterKey=NewRelicApiKey,ParameterValue=$NewRelicApiKey \
