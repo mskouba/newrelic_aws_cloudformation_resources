@@ -4,6 +4,8 @@ echo "Beginning Policy Test"
 
 cd "$(dirname "$0")"
 
+echo $PWD
+
 template=$( cat $PWD/policy-test-template.yml )
 stack_arn=$( aws cloudformation create-stack --stack-name "policy-test-template" \
 --template-body $template \
