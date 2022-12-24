@@ -222,12 +222,10 @@
     "readOnlyProperties": [
         "/properties/Condition/Id"
     ],
-    "createOnlyProperties": [
-        "/properties/Condition/PolicyId",
-        "/properties/Condition/Type"
-    ],
     "primaryIdentifier": [
-        "/properties/Condition/Id",
+        "/properties/Condition/Id"
+    ],
+    "conditionalCreateOnlyProperties": [
         "/properties/Condition/PolicyId",
         "/properties/Condition/Type"
     ],
