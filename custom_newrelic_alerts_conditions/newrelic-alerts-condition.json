@@ -225,10 +225,10 @@
     "primaryIdentifier": [
         "/properties/Condition/Id"
     ],
-    "conditionalCreateOnlyProperties": [
+    "createOnlyProperties": [
         "/properties/Condition/PolicyId",
         "/properties/Condition/Type"
-    ],
+    ], 
     "handlers": {
         "create": {
             "permissions": [

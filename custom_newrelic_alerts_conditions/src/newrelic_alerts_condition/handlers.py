@@ -99,6 +99,13 @@ def update_handler(
         # Returns a not found error if the condition Id passed to update is none
         if model.Condition.Id == None:
             raise exceptions.NotFound("Condition ID", model.Condition.Id)
+
+        if model.Condition.PolicyId != request.previousResourceState.Condition.PolicyId:
+            raise exceptions.NotUpdatable("Changing policy ID requires create and delete actions rather than update.")
+
+        if model.Condition.Type != request.previousResourceState.Condition.Type:
+            raise exceptions.NotUpdatable("Changing condition type requires create and delete actions rather than update.")
+            
         else:
 
             # Prepare request params for update call
